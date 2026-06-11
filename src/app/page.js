@@ -223,6 +223,26 @@ export default function HomePage() {
             className="w-full bg-[#1a1a2e] text-white py-4 rounded-xl font-bold text-base disabled:opacity-60">
             {loading ? 'Redirecting to payment...' : 'Pay RM14.99 & Get My Rights Audit'}
           </button>
+
+          {/* Trust Signals */}
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2">
+            <div className="flex items-start gap-2 text-xs text-gray-600">
+              <span>🔒</span>
+              <span><strong>Secured by AWAS Premium Resources</strong> (SSM 202603141446) — Registered Malaysian company. hello@awas.asia</span>
+            </div>
+            <div className="flex items-start gap-2 text-xs text-gray-600">
+              <span>📄</span>
+              <span><strong>Your policy is deleted immediately</strong> after parsing. Never stored on our servers.</span>
+            </div>
+            <div className="flex items-start gap-2 text-xs text-gray-600">
+              <span>🛡️</span>
+              <span><strong>PDPA Compliant.</strong> Only your email and phone are retained for payment records.</span>
+            </div>
+            <div className="flex items-start gap-2 text-xs text-gray-600">
+              <span>💳</span>
+              <span><strong>Payment via ToyyibPay</strong> — Malaysia's trusted FPX payment gateway.</span>
+            </div>
+          </div>
         </form>
 
         {/* Agent CTA */}
