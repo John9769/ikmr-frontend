@@ -1,9 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { checkPaymentStatus, parsePolicy } from '@/lib/api';
 
-export default function ParsePage() {
+function ParsePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('checking');
@@ -14,10 +14,7 @@ export default function ParsePage() {
 
   useEffect(() => {
     const ref = searchParams.get('ref');
-    if (!ref) {
-      router.push('/');
-      return;
-    }
+    if (!ref) { router.push('/'); return; }
     checkStatus(ref);
   }, []);
 
@@ -25,7 +22,6 @@ export default function ParsePage() {
     try {
       const res = await checkPaymentStatus(ref);
       const data = res.data;
-
       if (data.status === 'PAID') {
         setParseRequest(data);
         setStatus('ready');
@@ -50,15 +46,12 @@ export default function ParsePage() {
     if (!file || !parseRequest) return;
     setParsing(true);
     setError('');
-
     const formData = new FormData();
     formData.append('policy', file);
     formData.append('parseRequestId', parseRequest.parseRequestId);
     formData.append('shieldType', parseRequest.shieldType);
-
     try {
       const res = await parsePolicy(formData);
-      // Store results in localStorage — stateless
       localStorage.setItem('ikmr_result', JSON.stringify(res.data));
       router.push('/crisis-screen');
     } catch (err) {
@@ -94,10 +87,8 @@ export default function ParsePage() {
             Your payment may still be processing. Please check your email for a confirmation link.
             If you have not paid yet, please go back and complete payment.
           </p>
-          <button
-            onClick={() => router.push('/')}
-            className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm"
-          >
+          <button onClick={() => router.push('/')}
+            className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm">
             Back to Home
           </button>
         </div>
@@ -115,10 +106,8 @@ export default function ParsePage() {
             This policy has already been parsed. If you saved your results, check your device.
             To parse another policy, please make a new payment.
           </p>
-          <button
-            onClick={() => router.push('/')}
-            className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm"
-          >
+          <button onClick={() => router.push('/')}
+            className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm">
             Parse Another Policy
           </button>
         </div>
@@ -135,10 +124,8 @@ export default function ParsePage() {
           <p className="text-sm text-gray-500 mb-6">
             Please contact hello@awas.asia with your payment reference.
           </p>
-          <button
-            onClick={() => router.push('/')}
-            className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm"
-          >
+          <button onClick={() => router.push('/')}
+            className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm">
             Back to Home
           </button>
         </div>
@@ -148,7 +135,6 @@ export default function ParsePage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
       <div className="bg-[#1a1a2e] p-6 text-center">
         <div className="text-3xl font-bold text-white tracking-wide">IKMR</div>
         <div className="text-sm text-gray-300 mt-1">
@@ -159,14 +145,10 @@ export default function ParsePage() {
       <div className="flex-1 px-6 py-8 max-w-md mx-auto w-full">
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
           <div className="text-sm font-bold text-green-700">✅ Payment Confirmed</div>
-          <div className="text-xs text-green-600 mt-1">
-            You are ready to upload your policy for analysis.
-          </div>
+          <div className="text-xs text-green-600 mt-1">You are ready to upload your policy for analysis.</div>
         </div>
 
-        <h2 className="text-lg font-bold text-gray-900 mb-2">
-          Upload Your Policy Schedule
-        </h2>
+        <h2 className="text-lg font-bold text-gray-900 mb-2">Upload Your Policy Schedule</h2>
         <p className="text-sm text-gray-500 mb-6">
           Upload a PDF or take a clear photo of your policy schedule.
           Our AI will decode your rights in about 30 seconds.
@@ -181,41 +163,23 @@ export default function ParsePage() {
         {parsing ? (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🤖</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              AI Analyzing Your Policy
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Extracting your rights and identifying key clauses...
-            </p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">AI Analyzing Your Policy</h3>
+            <p className="text-sm text-gray-500 mb-4">Extracting your rights and identifying key clauses...</p>
             <div className="flex justify-center space-x-1">
               <div className="w-2 h-2 bg-[#1a1a2e] rounded-full animate-bounce"></div>
               <div className="w-2 h-2 bg-[#1a1a2e] rounded-full animate-bounce delay-100"></div>
               <div className="w-2 h-2 bg-[#1a1a2e] rounded-full animate-bounce delay-200"></div>
             </div>
-            <p className="text-xs text-gray-400 mt-6">
-              Please wait. Do not close this page.
-            </p>
+            <p className="text-xs text-gray-400 mt-6">Please wait. Do not close this page.</p>
           </div>
         ) : (
           <div className="space-y-4">
             <label className="block w-full border-2 border-dashed border-[#1a1a2e] rounded-xl p-8 text-center cursor-pointer hover:bg-gray-50">
               <div className="text-4xl mb-3">📄</div>
-              <div className="text-sm font-bold text-[#1a1a2e] mb-1">
-                Tap to Upload Policy
-              </div>
-              <div className="text-xs text-gray-400">
-                PDF, JPG or PNG — Max 10MB
-              </div>
-              <input
-                type="file"
-                accept=".pdf,image/*"
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files[0]) {
-                    handleUpload(e.target.files[0]);
-                  }
-                }}
-              />
+              <div className="text-sm font-bold text-[#1a1a2e] mb-1">Tap to Upload Policy</div>
+              <div className="text-xs text-gray-400">PDF, JPG or PNG — Max 10MB</div>
+              <input type="file" accept=".pdf,image/*" className="hidden"
+                onChange={(e) => { if (e.target.files[0]) { handleUpload(e.target.files[0]); } }} />
             </label>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -235,5 +199,17 @@ export default function ParsePage() {
         © 2026 AWAS Premium Resources. All rights reserved.
       </div>
     </div>
+  );
+}
+
+export default function ParsePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-400 text-sm">Loading...</div>
+      </div>
+    }>
+      <ParsePageContent />
+    </Suspense>
   );
 }
