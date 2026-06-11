@@ -122,7 +122,7 @@ export default function HomePage() {
                       <p className="text-[8px] font-bold text-white">📞 Call Insurer Hotline</p>
                     </div>
                     <div className="bg-[#1a1a2e] rounded-lg p-1.5 text-center">
-                      <p className="text-[8px] text-gray-300">⚡ Accident? Launch AWAS Core →</p>
+                      <p className="text-[8px] text-gray-300">⚡ Accident? Launch AWAS →</p>
                     </div>
                   </div>
                 </div>
