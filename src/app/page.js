@@ -60,12 +60,11 @@ export default function HomePage() {
       {/* Hero */}
       <div className="bg-gray-50 px-6 py-10 border-b border-gray-200">
         <div className="max-w-md mx-auto">
-          <h1 className="text-xl font-bold text-gray-900 mb-2 text-center">
-            This Is What You Get For RM14.99
+          <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2 text-center">
+            Your Rights, One Screenshot Away.
           </h1>
           <p className="text-sm text-gray-500 text-center mb-8">
-            Your insurance policy decoded into a Crisis Screen —
-            ready to show at hospital or roadside in seconds.
+            Decoded from your policy. Ready to show — at the hospital counter or roadside.
           </p>
 
           {/* Mobile Phone Mockup */}
