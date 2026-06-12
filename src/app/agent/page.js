@@ -6,7 +6,7 @@ const inputStyle = "w-full p-3 bg-white text-gray-900 border border-gray-300 rou
 
 export default function AgentPage() {
   const [tab, setTab] = useState('register');
-  const [form, setForm] = useState({ name: '', email: '', phone: '', bankName: '', bankAccount: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', licenseNumber: '', insurerName: '', bankName: '', bankAccount: '' });
   const [statsCode, setStatsCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,8 +20,8 @@ export default function AgentPage() {
     setSuccess('');
     try {
       const res = await registerAgent(form);
-      setSuccess(`Registration successful! Your agent code is: ${res.data.agentCode}`);
-      setForm({ name: '', email: '', phone: '', bankName: '', bankAccount: '' });
+      setSuccess(`${res.data.message} Your agent code is: ${res.data.agentCode}`);
+      setForm({ name: '', email: '', phone: '', licenseNumber: '', insurerName: '', bankName: '', bankAccount: '' });
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -157,6 +157,35 @@ export default function AgentPage() {
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   className={inputStyle}
                   placeholder="0123456789"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tied Agent / License Number
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.licenseNumber}
+                  onChange={(e) => setForm({ ...form, licenseNumber: e.target.value })}
+                  className={inputStyle}
+                  placeholder="e.g. PIAM/LIAM registration number"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Required for verification. Your account will be activated after review.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Insurance Company
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.insurerName}
+                  onChange={(e) => setForm({ ...form, insurerName: e.target.value })}
+                  className={inputStyle}
+                  placeholder="e.g. Allianz, AIA, Etiqa"
                 />
               </div>
               <div>
