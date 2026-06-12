@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { adminLogin, getAdminStats, getAdminParses, getAdminAgents, markPayoutDone } from '@/lib/api';
+import { adminLogin, getAdminStats, getAdminParses, getAdminAgents, approveAgent, rejectAgent, markPayoutDone } from '@/lib/api';
 
 const inputStyle = "w-full p-3 bg-white text-gray-900 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] placeholder-gray-400";
 
@@ -86,6 +86,28 @@ export default function AdminPage() {
     }
   };
 
+  const handleApprove = async (agentId, agentName) => {
+    if (!confirm(`Approve ${agentName} as an active agent?`)) return;
+    try {
+      await approveAgent(token, agentId);
+      loadAgents();
+      loadStats(token);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Approve failed');
+    }
+  };
+
+  const handleReject = async (agentId, agentName) => {
+    if (!confirm(`Reject and remove application from ${agentName}? This cannot be undone.`)) return;
+    try {
+      await rejectAgent(token, agentId);
+      loadAgents();
+      loadStats(token);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Reject failed');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('ikmr_admin_token');
     setLoggedIn(false);
@@ -163,13 +185,18 @@ export default function AdminPage() {
             <button
               key={tab}
               onClick={() => handleTabChange(tab)}
-              className={`py-3 text-sm font-medium capitalize border-b-2 whitespace-nowrap ${
+              className={`py-3 text-sm font-medium capitalize border-b-2 whitespace-nowrap flex items-center gap-1 ${
                 activeTab === tab
                   ? 'border-[#1a1a2e] text-[#1a1a2e]'
                   : 'border-transparent text-gray-500'
               }`}
             >
               {tab}
+              {tab === 'agents' && stats?.pendingAgents > 0 && (
+                <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
+                  {stats.pendingAgents}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -198,6 +225,16 @@ export default function AdminPage() {
                 <div className="text-2xl font-bold text-green-600">RM{stats.revenueYTD}</div>
               </div>
             </div>
+
+            {stats.pendingAgents > 0 && (
+              <button
+                onClick={() => handleTabChange('agents')}
+                className="w-full bg-orange-50 border border-orange-200 text-orange-700 rounded-xl p-4 text-sm font-semibold text-left flex justify-between items-center"
+              >
+                <span>🔔 {stats.pendingAgents} agent application{stats.pendingAgents > 1 ? 's' : ''} pending approval</span>
+                <span>Review →</span>
+              </button>
+            )}
 
             <div className="bg-white rounded-xl p-4 border border-gray-200">
               <div className="text-sm font-bold text-[#1a1a2e] mb-3">Breakdown</div>
@@ -272,7 +309,52 @@ export default function AdminPage() {
         {/* AGENTS */}
         {activeTab === 'agents' && (
           <div className="space-y-3">
-            {agents.map((agent) => (
+            {agents.filter(a => !a.isActive).length > 0 && (
+              <div className="text-xs font-bold text-orange-600 uppercase tracking-wide pt-1">
+                Pending Approval
+              </div>
+            )}
+            {agents.filter(a => !a.isActive).map((agent) => (
+              <div key={agent.id} className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <div className="text-sm font-bold text-[#1a1a2e]">{agent.name}</div>
+                    <div className="text-xs text-gray-500">{agent.email}</div>
+                    <div className="text-xs text-gray-500">{agent.phone}</div>
+                    <div className="text-xs text-gray-500">Code: {agent.agentCode}</div>
+                  </div>
+                  <div className="text-xs px-2 py-1 rounded-full font-medium bg-orange-100 text-orange-700">
+                    PENDING
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
+                  <div>License: <span className="font-medium text-[#1a1a2e]">{agent.licenseNumber || '—'}</span></div>
+                  <div>Insurer: <span className="font-medium text-[#1a1a2e]">{agent.insurerName || '—'}</span></div>
+                  <div className="col-span-2">Bank: <span className="font-medium text-[#1a1a2e]">{agent.bankName} — {agent.bankAccount}</span></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleApprove(agent.id, agent.name)}
+                    className="bg-green-600 text-white py-2 rounded-lg text-xs font-bold"
+                  >
+                    ✅ Approve
+                  </button>
+                  <button
+                    onClick={() => handleReject(agent.id, agent.name)}
+                    className="bg-red-600 text-white py-2 rounded-lg text-xs font-bold"
+                  >
+                    ✕ Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {agents.filter(a => a.isActive).length > 0 && (
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wide pt-3">
+                Active Agents
+              </div>
+            )}
+            {agents.filter(a => a.isActive).map((agent) => (
               <div key={agent.id} className="bg-white rounded-xl p-4 border border-gray-200">
                 <div className="flex justify-between items-start mb-2">
                   <div>
@@ -280,10 +362,8 @@ export default function AdminPage() {
                     <div className="text-xs text-gray-500">{agent.email}</div>
                     <div className="text-xs text-gray-500">Code: {agent.agentCode}</div>
                   </div>
-                  <div className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    agent.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                  }`}>
-                    {agent.isActive ? 'ACTIVE' : 'INACTIVE'}
+                  <div className="text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-700">
+                    ACTIVE
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-xs text-gray-500 mb-3">

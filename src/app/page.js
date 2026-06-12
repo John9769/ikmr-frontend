@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { createBill, validateAgentCode } from '@/lib/api';
 
 const inputStyle = "w-full p-3 bg-white text-gray-900 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] placeholder-gray-400";
@@ -61,76 +62,28 @@ export default function HomePage() {
       <div className="bg-gray-50 px-6 py-10 border-b border-gray-200">
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2 text-center">
-            Your Rights, One Screenshot Away.
+            Stop Guessing Your Policy Cover.
           </h1>
-          <p className="text-sm text-gray-500 text-center mb-8">
-            Decoded from your policy. Ready to show — at the hospital counter or roadside.
+          <p className="text-sm text-gray-500 text-center mb-6">
+            Let us verify it in 60 seconds.
           </p>
 
-          {/* Mobile Phone Mockup */}
-          <div className="flex justify-center mb-8">
-            <div className="relative">
-              <div className="w-64 bg-gray-900 rounded-[2.5rem] p-2 shadow-2xl border-4 border-gray-800">
-                <div className="flex justify-center mb-1">
-                  <div className="w-16 h-4 bg-gray-800 rounded-full"></div>
-                </div>
-                <div className="bg-gray-50 rounded-[2rem] overflow-hidden">
-                  <div className="bg-[#1a1a2e] px-3 py-2">
-                    <div className="text-white text-xs font-bold">IKMR</div>
-                    <div className="text-gray-400 text-[10px]">🏥 Medical Rights Audit</div>
-                  </div>
-                  <div className="p-2 space-y-2 bg-gray-50">
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-1.5 text-center">
-                      <p className="text-[9px] font-bold text-yellow-800">📸 SCREENSHOT & SAVE</p>
-                    </div>
-                    <div className="bg-[#1a1a2e] rounded-lg p-2">
-                      <div className="text-[8px] text-gray-400">OFFICIAL POLICY RIGHTS HOLDER</div>
-                      <div className="text-[10px] font-bold text-white">Syarikat Insurans Malaysia</div>
-                      <div className="text-[8px] text-gray-300">Policy: MED-2024-XXXX</div>
-                      <div className="text-[8px] text-gray-300">Valid until: 31/12/2026</div>
-                    </div>
-                    <div className="bg-white border border-gray-200 rounded-lg p-2">
-                      <div className="text-[9px] font-bold text-[#1a1a2e] mb-1">🛏️ WARD ENTITLEMENT</div>
-                      <div className="flex justify-between">
-                        <span className="text-[8px] text-gray-500">Room & Board</span>
-                        <span className="text-[8px] font-bold text-green-600">RM250/DAY</span>
-                      </div>
-                      <div className="bg-blue-50 rounded p-1 mt-1">
-                        <p className="text-[8px] text-blue-800">You qualify for Standard Single Room. Reject any lower ward offer.</p>
-                      </div>
-                    </div>
-                    <div className="bg-white border border-gray-200 rounded-lg p-2">
-                      <div className="text-[9px] font-bold text-[#1a1a2e] mb-1">🛑 CO-PAYMENT</div>
-                      <div className="flex justify-between">
-                        <span className="text-[8px] text-gray-500">Status</span>
-                        <span className="text-[8px] font-bold text-green-600">NONE ✅</span>
-                      </div>
-                      <div className="bg-blue-50 rounded p-1 mt-1">
-                        <p className="text-[8px] text-blue-800">You pay RM0 at discharge. 100% cashless.</p>
-                      </div>
-                    </div>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-2">
-                      <div className="text-[9px] font-bold text-red-700 mb-1">⚠️ WARNING DETECTED</div>
-                      <p className="text-[8px] text-red-700">Premium escalation clause detected. Review at next renewal.</p>
-                    </div>
-                    <div className="bg-white border-2 border-[#1a1a2e] rounded-lg p-2">
-                      <div className="text-[9px] font-bold text-[#1a1a2e] mb-1">🚨 EMERGENCY ACTION</div>
-                      <p className="text-[8px] text-gray-700">1. Show this screen at counter. 2. Request Single Room. 3. Call insurer if denied.</p>
-                    </div>
-                    <div className="bg-[#1a1a2e] rounded-lg p-2 text-center">
-                      <p className="text-[8px] font-bold text-white">📞 Call Insurer Hotline</p>
-                    </div>
-                    <div className="bg-[#1a1a2e] rounded-lg p-1.5 text-center">
-                      <p className="text-[8px] text-gray-300">⚡ Accident? Launch AWAS →</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-center mt-1">
-                  <div className="w-20 h-1 bg-gray-600 rounded-full"></div>
-                </div>
-              </div>
-            </div>
+          {/* Headache — Before Image */}
+          <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-gray-200 mb-4">
+            <Image
+              src="/headache-home.png"
+              alt="Confused while reading insurance policy document at home"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
+
+          <p className="text-sm text-gray-700 text-center mb-8 leading-relaxed">
+            40 pages of jargon. You don&apos;t know what you&apos;re really covered for — until it&apos;s too late.{' '}
+            <span className="font-bold text-[#1a1a2e]">IKMR decodes your policy into a Crisis Screen</span>{' '}
+            you can show at the hospital counter or roadside, in seconds.
+          </p>
 
           {/* Value Props */}
           <div className="grid grid-cols-3 gap-3 text-center">

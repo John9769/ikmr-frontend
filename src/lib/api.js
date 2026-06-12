@@ -33,6 +33,12 @@ export const getAdminParses = (token, page, status, shieldType) => api.get(
 export const getAdminAgents = (token) => api.get('/admin/agents', {
   headers: { Authorization: `Bearer ${token}` }
 });
+export const approveAgent = (token, agentId) => api.post(`/admin/agents/${agentId}/approve`, {}, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+export const rejectAgent = (token, agentId) => api.delete(`/admin/agents/${agentId}`, {
+  headers: { Authorization: `Bearer ${token}` }
+});
 export const markPayoutDone = (token, agentId) => api.post(`/admin/payout/${agentId}`, {}, {
   headers: { Authorization: `Bearer ${token}` }
 });
