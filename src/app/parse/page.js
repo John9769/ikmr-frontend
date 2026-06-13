@@ -11,10 +11,15 @@ function ParsePageContent() {
   const [parsing, setParsing] = useState(false);
   const [error, setError] = useState('');
   const [attempts, setAttempts] = useState(0);
+  const [pageUrl, setPageUrl] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const ref = searchParams.get('ref');
     if (!ref) { router.push('/'); return; }
+    if (typeof window !== 'undefined') {
+      setPageUrl(window.location.href);
+    }
     checkStatus(ref);
   }, []);
 
@@ -39,6 +44,16 @@ function ParsePageContent() {
       }
     } catch (err) {
       setStatus('error');
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // clipboard not available — ignore silently
     }
   };
 
@@ -87,6 +102,16 @@ function ParsePageContent() {
             Your payment may still be processing. Please check your email for a confirmation link.
             If you have not paid yet, please go back and complete payment.
           </p>
+          {pageUrl && (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-left">
+              <p className="text-xs text-gray-500 mb-2">Save this link — you can come back to it anytime:</p>
+              <p className="text-xs text-[#1a1a2e] break-all font-mono mb-2">{pageUrl}</p>
+              <button onClick={handleCopyLink}
+                className="text-xs font-semibold text-[#1a1a2e] underline">
+                {copied ? 'Copied!' : 'Copy Link'}
+              </button>
+            </div>
+          )}
           <button onClick={() => router.push('/')}
             className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm">
             Back to Home
@@ -147,6 +172,20 @@ function ParsePageContent() {
           <div className="text-sm font-bold text-green-700">✅ Payment Confirmed</div>
           <div className="text-xs text-green-600 mt-1">You are ready to upload your policy for analysis.</div>
         </div>
+
+        {pageUrl && !parsing && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+            <p className="text-xs font-bold text-amber-800 mb-1">📌 Not ready to upload now?</p>
+            <p className="text-xs text-amber-700 mb-2">
+              Save this link — you can come back anytime to upload your policy:
+            </p>
+            <p className="text-xs text-[#1a1a2e] break-all font-mono mb-2">{pageUrl}</p>
+            <button onClick={handleCopyLink}
+              className="text-xs font-semibold text-[#1a1a2e] underline">
+              {copied ? 'Copied!' : 'Copy Link'}
+            </button>
+          </div>
+        )}
 
         <h2 className="text-lg font-bold text-gray-900 mb-2">Upload Your Policy Schedule</h2>
         <p className="text-sm text-gray-500 mb-6">
