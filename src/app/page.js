@@ -15,6 +15,10 @@ export default function HomePage() {
   const [agentChecking, setAgentChecking] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showLinkStep, setShowLinkStep] = useState(false);
+  const [savedLink, setSavedLink] = useState('');
+  const [savedPaymentUrl, setSavedPaymentUrl] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -41,11 +45,29 @@ export default function HomePage() {
     setLoading(true);
     try {
       const res = await createBill({ shieldType: form.shieldType, email: form.email, phone: form.phone, agentCode: form.agentCode || null });
-      window.location.href = res.data.paymentUrl;
+      const link = `${window.location.origin}/parse?ref=${res.data.parseRequestId}`;
+      setSavedLink(link);
+      setSavedPaymentUrl(res.data.paymentUrl);
+      setShowLinkStep(true);
+      setLoading(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create payment. Please try again.');
       setLoading(false);
     }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(savedLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // clipboard not available — ignore silently
+    }
+  };
+
+  const handleContinueToPayment = () => {
+    window.location.href = savedPaymentUrl;
   };
 
   return (
@@ -71,7 +93,7 @@ export default function HomePage() {
           {/* Headache — Before Image */}
           <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-gray-200 mb-4">
             <Image
-              src="/headache-home.png"
+              src="/headache-home.jpg"
               alt="Confused while reading insurance policy document at home"
               fill
               className="object-cover"
@@ -267,6 +289,34 @@ export default function HomePage() {
             <button onClick={() => setShowPrivacy(false)}
               className="w-full bg-[#1a1a2e] text-white py-3 rounded-xl font-semibold text-sm mt-6">
               Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Save Link Before Payment Modal */}
+      {showLinkStep && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center px-6">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6">
+            <div className="text-center mb-4">
+              <div className="text-4xl mb-2">📌</div>
+              <h2 className="text-lg font-bold text-gray-900">Save This Link First</h2>
+              <p className="text-sm text-gray-500 mt-2">
+                After payment, you&apos;ll need this link to upload your policy. Copy it now or screenshot this screen — just in case.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
+              <p className="text-xs text-[#1a1a2e] break-all font-mono mb-2">{savedLink}</p>
+              <button onClick={handleCopyLink}
+                className="text-xs font-semibold text-[#1a1a2e] underline">
+                {copied ? '✅ Copied!' : 'Copy Link'}
+              </button>
+            </div>
+
+            <button onClick={handleContinueToPayment}
+              className="w-full bg-[#1a1a2e] text-white py-4 rounded-xl font-bold text-base">
+              Continue to Payment — RM14.99
             </button>
           </div>
         </div>
